@@ -1,11 +1,14 @@
 const int buttonPin = 26;
 const int ledPin = 27;
-const int ledChannel = 0;
 const int checkTime = 100; // in ms
+const int ledChannel = 0;
 
 int ledState = 1;
 int buttonState = 0;
 int lastButtonState = 0;
+
+int brightness = 0;
+int fadeAmount = 5;
 
 long loopCount = 0;
 long loopSpeed = 0;

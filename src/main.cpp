@@ -1,21 +1,22 @@
 #include <Arduino.h>
 #include "../conf/config.h"
 
+int fStartTime = 0;
+int fDelay = 30; // 30 ms
+
 void setup() {
   Serial.begin(115200);
 
   int freq = 5000;
-  int resolution = 8;
+  int resolution = 13;
 
   ledcSetup(ledChannel, freq, resolution);
   ledcAttachPin(ledPin, ledChannel);
 
   pinMode(buttonPin, INPUT);
-  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
-  return;
   if (!loopSpeed) {
     loopSpeed = getLoopSpeed();
   } else {
@@ -49,7 +50,6 @@ void checkBtnState(int reading) {
     if (reading != buttonState) {
       buttonState = reading;
       if (buttonState == HIGH) {
-        Serial.println("YEW!!!");
         ledState = !ledState;
       }
     }
@@ -66,17 +66,21 @@ void animateLed() {
       loopCount = 0;
     }
   } else {
-    if (loopCount < ms(500)) {
-      for (int dutyCycle = 0; dutyCycle <= 255; dutyCycle++) {
-        ledcWrite(ledChannel, dutyCycle);
-        delay(7);
+    unsigned long now = millis();
+    if (!fStartTime) {
+      fStartTime = now;
+    } else if ((now - fStartTime) > fDelay) {
+      int valueMax = 255;
+      // calculate duty, 8191 from 2 ^ 13 - 1
+      uint32_t duty = (8191 / valueMax) * min(brightness, valueMax);
+      // write duty to LEDC
+      ledcWrite(ledChannel, duty);
+      brightness = brightness + fadeAmount;
+      if (brightness <= 0 || brightness >= 255) {
+        fadeAmount = -fadeAmount;
       }
-      for (int dutyCycle = 255; dutyCycle >= 0; dutyCycle--) {
-        ledcWrite(ledChannel, dutyCycle);
-        delay(7);
-      }
-    } else {
-      loopCount = 0;
+      fStartTime = now;
     }
+    loopCount = 0;
   }
 }
