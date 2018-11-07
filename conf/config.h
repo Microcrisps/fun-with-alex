@@ -1,5 +1,5 @@
-const int buttonPin = 26;
-const int ledPin = 27;
+const int buttonPin = 27;
+const int ledPin = 26;
 const int checkTime = 100; // in ms
 const int ledChannel = 0;
 

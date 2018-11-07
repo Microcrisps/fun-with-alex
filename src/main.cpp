@@ -1,11 +1,14 @@
 #include <Arduino.h>
 #include "../conf/config.h"
+#include <ArduinoOTA.h>
 
 int fStartTime = 0;
 int fDelay = 30; // 30 ms
 
 void setup() {
   Serial.begin(115200);
+
+  ArduinoOTA.setPassword("admin");
 
   int freq = 5000;
   int resolution = 13;
@@ -17,6 +20,15 @@ void setup() {
 }
 
 void loop() {
+
+  // int sensorVal = digitalRead(buttonPin);
+  // Serial.println(buttonPin);
+  // if (sensorVal == HIGH) {
+  //   ledcWrite(ledChannel, 0);
+  // } else {
+  //   ledcWrite(ledChannel, 255);
+  // }
+
   if (!loopSpeed) {
     loopSpeed = getLoopSpeed();
   } else {
@@ -76,6 +88,7 @@ void animateLed() {
       // write duty to LEDC
       ledcWrite(ledChannel, duty);
       brightness = brightness + fadeAmount;
+
       if (brightness <= 0 || brightness >= 255) {
         fadeAmount = -fadeAmount;
       }
